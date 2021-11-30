@@ -1,0 +1,79 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>WebRtc tutorial</title>
+    <style>
+        #chatlist {
+            width : 300px;
+            height: 300px;
+            background-color: #f5d682;
+            border : solid 1px black;
+        }
+        #chatwrite {
+            width : 300px;
+            height: 50px;
+            border : solid 1px black;
+        }
+        #chathis{
+            width : 300px;
+            height: 300px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <!-- 내 얼굴 -->
+        <video id="localVideo" autoplay width="480px"></video>
+        <!-- 상 대방 얼굴 -->
+        <video id="remoteVideo" width="480px" autoplay></video>
+
+        <div>
+            <div id="chatlist">
+                <textarea id="chathis"></textarea>
+            </div>
+            <div id="chatwrite">
+                <textarea id="chatctnt"></textarea>
+                <button id="msg-send" placeholder="message">SEND </button>
+            </div>
+        </div>
+        
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="./rtc.js"></script>
+    <script src="./anycall.js"></script>
+    <script>
+        annyang.start({ autoRestart: false, continuous: true })
+        var recognition = annyang.getSpeechRecognizer();
+        var final_transcript = '';
+        recognition.interimResults = true;
+        recognition.onresult = function(event) {
+            var interim_transcript = '';
+            final_transcript = '';
+            for (var i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    final_transcript += event.results[i][0].transcript;
+                    console.log("final_transcript="+final_transcript);
+                    //annyang.trigger(final_transcript); //If the sentence is "final" for the Web Speech API, we can try to trigger the sentence
+                    if(final_transcript != ''){
+                        document.getElementById('chatctnt').value = final_transcript;
+                        console.log("클릭");
+                        document.getElementById('msg-send').click();
+                    }
+                } else {
+                    interim_transcript += event.results[i][0].transcript;
+                    console.log("interim_transcript="+interim_transcript);
+                }
+            }
+            
+            //console.log('interim='+interim_transcript+'|final='+final_transcript);
+        };
+    </script>
+</body>
+
+
+</html>
